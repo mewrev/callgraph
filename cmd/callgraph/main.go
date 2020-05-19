@@ -187,8 +187,27 @@ func parseEdges(s string, fns []Func) ([]Edge, error) {
 		case 2:
 			edge.Dst = sts[0]
 			edge.Src = sts[1]
-		default:
-			return nil, errors.Errorf("invalid number of stack frames; expected <=2, got %d; bp=%q, sts=%v", len(sts), bp, sts)
+		default: // > 2
+			for i := 0; i < len(sts); i++ {
+				dst := sts[i]
+				if dst.StackFrameNum != 0 {
+					log.Printf("invalid stack frame number; expected #0, got #%d", dst.StackFrameNum)
+					break
+				}
+				edge := Edge{
+					Dst: dst,
+				}
+				if i+1 < len(sts) {
+					src := sts[i+1]
+					if src.StackFrameNum != 0 {
+						edge.Src = src
+						i++
+					}
+				}
+				// TODO: handle srcLine?
+				edges = append(edges, edge)
+			}
+			continue
 		}
 		// Source code of callee source line.
 		//
