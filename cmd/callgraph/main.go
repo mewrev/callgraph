@@ -181,7 +181,8 @@ func parseEdges(s string, fns []Func) ([]Edge, error) {
 		edge := Edge{}
 		switch len(sts) {
 		case 0:
-			return nil, errors.Errorf("unable to determine caller/callee of stack frame %q", bp)
+			log.Printf("unable to determine caller/callee of stack frame %q", bp)
+			continue
 		case 1:
 			edge.Dst = sts[0]
 		case 2:
